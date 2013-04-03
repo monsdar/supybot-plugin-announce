@@ -1,1 +1,2 @@
-Insert a description of your plugin here, with any notes, etc. about using it.
+
+This is a Supybot plugin which announces headlines.
