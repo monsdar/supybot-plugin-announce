@@ -24,7 +24,7 @@ WEEK = 7 * DAY
 MONTH = 4 * WEEK
 
 class Announcement():
-    def __init__(self, channel="", expiration=WEEK, headline="", message="", time=0):
+    def __init__(self, channel="", expiration=1, headline="", message="", time=0):
         self.channel = channel
         self.headline = headline
         self.message = message
@@ -32,7 +32,7 @@ class Announcement():
         
         #default to a week expiration
         if(expiration == 0):
-            expiration = WEEK
+            expiration = expiration * HOURS
         self.expiration = expiration #int, in seconds
         
     def __str__(self):
@@ -70,7 +70,7 @@ class Announce(callbacks.Plugin):
         """[<channel>] <expiration> <title>: <message>
         
         Adds an announcement with <title> and <text> to the plugin.
-        Expires in <expiration> seconds, default is a week if 0 is given.
+        Expires in <expiration> HOURS.
         If no <channel> is given the current channel will be used. You need to be op in the channel."""
         try:
             (headline, text) = message.split(': ', 1)
