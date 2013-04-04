@@ -78,7 +78,7 @@ class Announce(callbacks.Plugin):
             irc.reply("Invalid <title> or <message>")
             raise callbacks.ArgumentError
             
-        announcement = Announcement(channel, expiration, headline, message, time=time.time())        
+        announcement = Announcement(channel, expiration, headline, text, time=time.time())        
         self.announcements.append(announcement)
         irc.replySuccess()
     add = wrap(add, [('checkChannelCapability', 'op'), 'int', 'text'])
@@ -155,9 +155,6 @@ class Announce(callbacks.Plugin):
             if( currentTime <= (announcement.date + announcement.expiration) ):
                 #not expired yet
                 continue
-                
-            irc.reply("Time of '" + announcement.headline + "': " + str(announcement.date + announcement.expiration))
-            irc.reply("Current Time: " + str(currentTime) )
             removeIndeces.append(index)
         
         for index, announcement in enumerate(removeIndeces):
