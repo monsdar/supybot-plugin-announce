@@ -28,7 +28,11 @@ class Announcement():
         self.channel = channel
         self.headline = headline
         self.message = message
-        self.date = time
+        self.date = int(time)
+        
+        #default to a week expiration
+        if(expiration == 0):
+            expiration = WEEK
         self.expiration = expiration #int, in seconds
         
     def __str__(self):
@@ -74,11 +78,7 @@ class Announce(callbacks.Plugin):
             irc.reply("Invalid <title> or <message>")
             raise callbacks.ArgumentError
             
-        #TODO: Does not seem to work...
-        if(expiration == 0):
-            expiration = WEEK
-            
-        announcement = Announcement(channel, expiration, headline, message, time=time.time())
+        announcement = Announcement(channel, expiration, headline, message, time=time.time())        
         self.announcements.append(announcement)
         irc.replySuccess()
     add = wrap(add, [('checkChannelCapability', 'op'), 'int', 'text'])
@@ -102,7 +102,7 @@ class Announce(callbacks.Plugin):
         
         Lists the announcements by title along with their index."""
         if(len(self.announcements) == 0):
-            irc.error('There are no announcements')
+            irc.reply('There are no announcements')
             return
             
         for index, announcement in enumerate(self.announcements):
@@ -125,22 +125,46 @@ class Announce(callbacks.Plugin):
         
         Prints the actual (not expired) headlines of the current given <channel>"""
         writtenSomething = False
-        #TODO: This does not print as expected... expired? It works after reload...
         for announcement in self.announcements:
             if(announcement.channel != channel):
                 #announcement is for another channel
                 continue
-            if( (announcement.date + announcement.expiration) > time.time() ):
+            if( (announcement.date + announcement.expiration) < int(time.time()) ):
                 #announcement expired
                 continue
-                
             irc.queueMsg( ircmsgs.privmsg(channel, str(announcement)) )
             writtenSomething = True
             
         if not(writtenSomething):
-            irc.queueMsg( ircmsgs.privmsg(channel, "No announcements...") )
+            #do not spam if there is nothing to write about....
+            #irc.queueMsg( ircmsgs.privmsg(channel, "No announcements...") )
             pass
     headlines = wrap(headlines, [('checkChannelCapability', 'op')])
+    
+    def cleanup(self, irc, msg, args, channel):
+        """[<channel>]
+        
+        Cleans up the expired messages for the given <channel>.
+        Defaults to the current <channel>. You need to be op in the <channel>."""
+        removeIndeces = []
+        currentTime = int(time.time())
+        for index, announcement in enumerate(self.announcements):
+            if not(channel == announcement.channel):
+                #not the selected channel
+                continue
+            if( currentTime <= (announcement.date + announcement.expiration) ):
+                #not expired yet
+                continue
+                
+            irc.reply("Time of '" + announcement.headline + "': " + str(announcement.date + announcement.expiration))
+            irc.reply("Current Time: " + str(currentTime) )
+            removeIndeces.append(index)
+        
+        for index, announcement in enumerate(removeIndeces):
+            del self.announcements[announcement - index]
+        
+        irc.reply("Removed " + str( len(removeIndeces)) + " announcements")
+    cleanup = wrap(cleanup, [('checkChannelCapability', 'op')])
     
 Class = Announce
 
