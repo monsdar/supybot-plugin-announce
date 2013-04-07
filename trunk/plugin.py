@@ -96,7 +96,7 @@ class Announce(callbacks.Plugin):
         irc.replySuccess()
     delete = wrap(delete, [('checkChannelCapability', 'op'), 'int'])
     
-    def announcements(self, irc, msg, args):
+    def listall(self, irc, msg, args):
         """takes no arguments
         
         Lists the announcements by title along with their index."""
@@ -106,7 +106,7 @@ class Announce(callbacks.Plugin):
             
         for index, announcement in enumerate(self.announcements):
             irc.reply("<" + str(index) + "> - " + announcement.headline)
-    announcements = wrap(announcements)
+    listall = wrap(listall)
     
     def output(self, irc, msg, args, index):
         """<index>
