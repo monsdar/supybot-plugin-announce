@@ -66,7 +66,7 @@ class Announce(callbacks.Plugin):
             print("More: Error when pickling to file...")
             print(error)
 
-    def add(self, irc, msg, args, channel, expiration, message):
+    def new(self, irc, msg, args, channel, expiration, message):
         """[<channel>] <expiration> <title>: <message>
         
         Adds an announcement with <title> and <text> to the plugin.
@@ -81,10 +81,9 @@ class Announce(callbacks.Plugin):
         announcement = Announcement(channel, expiration, headline, text, time=time.time())        
         self.announcements.append(announcement)
         irc.replySuccess()
-    add = wrap(add, [('checkChannelCapability', 'op'), 'int', 'text'])
-    #add = wrap(add)
+    new = wrap(new, [('checkChannelCapability', 'op'), 'int', 'text'])
     
-    def remove(self, irc, msg, args, channel, index):
+    def delete(self, irc, msg, args, channel, index):
         """[index]
         
         Removes <index> from the announcements.
@@ -95,9 +94,9 @@ class Announce(callbacks.Plugin):
         
         del self.announcements[index]
         irc.replySuccess()
-    remove = wrap(remove, [('checkChannelCapability', 'op'), 'int'])
+    delete = wrap(delete, [('checkChannelCapability', 'op'), 'int'])
     
-    def list(self, irc, msg, args):
+    def announcements(self, irc, msg, args):
         """takes no arguments
         
         Lists the announcements by title along with their index."""
@@ -107,7 +106,7 @@ class Announce(callbacks.Plugin):
             
         for index, announcement in enumerate(self.announcements):
             irc.reply("<" + str(index) + "> - " + announcement.headline)
-    list = wrap(list)
+    announcements = wrap(announcements)
     
     def output(self, irc, msg, args, index):
         """<index>
