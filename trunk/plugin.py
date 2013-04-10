@@ -29,11 +29,7 @@ class Announcement():
         self.headline = headline
         self.message = message
         self.date = int(time)
-        
-        #default to a week expiration
-        if(expiration == 0):
-            expiration = expiration * HOURS
-        self.expiration = expiration #int, in seconds
+        self.expiration = int(expiration * HOUR) #convert the input to hours
         
     def __str__(self):
         output = ""
